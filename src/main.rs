@@ -13,7 +13,10 @@ async fn add(x: i32, y: i32) -> Option<i32> {
     let ans = x + y;
 
     if ans <= 10 {
-        info!(ans = ans, "特に出すべきログがないからとりあえず適当なメッセージを出しています");
+        info!(
+            ans = ans,
+            "特に出すべきログがないからとりあえず適当なメッセージを出しています"
+        );
         Some(ans)
     } else {
         error!(ans = ans, "something went wrong");
