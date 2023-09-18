@@ -34,13 +34,11 @@ async fn main() {
     let service = env!("CARGO_PKG_NAME");
     let version = env!("CARGO_PKG_VERSION");
 
-    init_tracing(service, version);
+    let _guard = init_tracing(service, version);
 
     let value = start(1, 2).await;
     println!("{:?}", value);
 
     let value = start(10, 22).await;
     println!("{:?}", value);
-
-    opentelemetry::global::shutdown_tracer_provider();
 }

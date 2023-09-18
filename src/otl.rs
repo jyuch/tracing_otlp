@@ -1,6 +1,14 @@
 use opentelemetry::sdk::metrics::controllers::BasicController;
 use opentelemetry_otlp::WithExportConfig;
 
+pub(crate) struct OtelInitGuard();
+
+impl Drop for OtelInitGuard {
+    fn drop(&mut self) {
+        opentelemetry::global::shutdown_tracer_provider();
+    }
+}
+
 // https://github.com/open-telemetry/opentelemetry-rust/blob/d4b9befea04bcc7fc19319a6ebf5b5070131c486/examples/basic-otlp/src/main.rs#L35-L52
 fn build_metrics_controller() -> BasicController {
     use opentelemetry::sdk::export::metrics::aggregation::cumulative_temporality_selector;
@@ -21,7 +29,7 @@ fn build_metrics_controller() -> BasicController {
         .expect("Failed to build metrics controller")
 }
 
-pub(crate) fn init_tracing(service: &'static str, version: &'static str) {
+pub(crate) fn init_tracing(service: &'static str, version: &'static str) -> OtelInitGuard {
     use opentelemetry::sdk::trace::{RandomIdGenerator, Sampler};
 
     // Configure otel exporter.
@@ -58,4 +66,6 @@ pub(crate) fn init_tracing(service: &'static str, version: &'static str) {
         .with(otel_metrics_layer)
         .with(tracing_subscriber::filter::LevelFilter::INFO)
         .init();
+
+    OtelInitGuard()
 }
